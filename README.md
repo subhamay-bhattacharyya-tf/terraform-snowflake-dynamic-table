@@ -40,7 +40,7 @@ locals {
 }
 
 module "dynamic_tables" {
-  source = "path/to/terraform-snowflake-dynamic-table"
+  source = "github.com/subhamay-bhattacharyya-tf/terraform-snowflake-dynamic-table?ref=main"
 
   dynamic_table_configs = local.dynamic_tables
 }

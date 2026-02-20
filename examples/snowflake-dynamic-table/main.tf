@@ -83,7 +83,7 @@ locals {
 }
 
 module "dynamic_tables" {
-  source = "../.."
+  source = "git::https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-dynamic-table.git"
 
   dynamic_table_configs = local.dynamic_tables
 }
