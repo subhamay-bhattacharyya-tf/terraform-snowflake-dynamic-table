@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
-# Terraform Snowflake Dynamic Table Module - Basic Example Versions
+# Terraform Snowflake Dynamic Table Module - Advanced Example Versions
 # -----------------------------------------------------------------------------
 # This file specifies the required Terraform version and provider versions
-# for the basic example.
+# for the advanced example.
 # -----------------------------------------------------------------------------
 
 terraform {

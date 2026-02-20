@@ -1,31 +1,23 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-## 1.0.0 (2026-02-04)
-
-### Features
-
-* **snowflake-warehouse:** support multiple warehouses via map configuration ([fc62535](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse/commit/fc62535a424e12f43a9a8ece9cb7181952f3cbf4))
-
 ## [unreleased]
 
 ### 🚀 Features
 
-- *(snowflake-warehouse)* Support multiple warehouses via map configuration
+- [**breaking**] Convert to Snowflake Dynamic Table module with single-module layout
 
 ### 🚜 Refactor
 
-- Restructure project to modular Terraform architecture
+- Update module source references and expand target_lag validation
 
 ### 📚 Documentation
 
-- *(readme)* Update badges to reflect Snowflake focus
+- Update CHANGELOG.md [skip ci]
+- Update CHANGELOG.md [skip ci]
+- Update module source references and target_lag validation
 
 ### 🎨 Styling
 
-- *(snowflake-warehouse)* Add periods to output descriptions
+- *(main.tf)* Align Snowflake dynamic table resource attributes
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(github-actions)* Add permissions and token for changelog generation
+- Expand test coverage and add environment variable configuration

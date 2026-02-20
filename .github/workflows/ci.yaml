@@ -8,11 +8,15 @@ on:
       - 'feature/**'
       - 'bug/**'
     paths:
-      - modules/**
+      - '*.tf'
+      - 'examples/**'
+      - 'tests/**'
   pull_request:
     branches: [main]
     paths:
-      - modules/**
+      - '*.tf'
+      - 'examples/**'
+      - 'tests/**'
   workflow_dispatch:
 
 permissions:
@@ -27,13 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
-    strategy:
-      matrix:
-        module:
-          - modules/snowflake-warehouse
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -42,48 +42,12 @@ jobs:
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
-        working-directory: ${{ matrix.module }}
 
       - name: Terraform Init
         run: terraform init -backend=false
-        working-directory: ${{ matrix.module }}
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ${{ matrix.module }}
-
-  # ============================================================================
-  # Property Tests
-  # ============================================================================
-  property-tests:
-    name: Property Tests
-    runs-on: ubuntu-latest
-    needs: terraform-validate
-    env:
-      TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          cache-dependency-path: tests/package-lock.json
-
-      - name: Install Dependencies
-        run: npm ci
-        working-directory: tests
-
-      - name: Run Property Tests
-        run: npm test -- --run
-        working-directory: tests
 
   # ============================================================================
   # Validate Examples
@@ -93,14 +57,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform-validate
     env:
-      TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
+      TF_VERSION: '1.3.0'
     strategy:
       matrix:
         example:
-          - examples/snowflake-warehouse
+          - examples/basic
+          - examples/snowflake-dynamic-table
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -116,9 +81,161 @@ jobs:
         working-directory: ${{ matrix.example }}
 
   # ============================================================================
+  # Terratest Tests
+  # ============================================================================
+  terratest:
+    name: Terratest
+    runs-on: ubuntu-latest
+    needs: examples-validate
+    env:
+      TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
+      GO_VERSION: ${{ vars.GO_VERSION || '1.21' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: tests/go.sum
+
+      - name: Download Go Modules
+        run: go mod download
+        working-directory: tests
+
+      - name: Run Terratest - Valid Input Acceptance
+        id: valid-input-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestValidInputAcceptance 2>&1 | tee valid_input_output.txt
+          echo "## Valid Input Acceptance Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat valid_input_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Advanced Example Validation
+        id: advanced-example-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestAdvancedExampleValidation 2>&1 | tee advanced_example_output.txt
+          echo "## Advanced Example Validation Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat advanced_example_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Empty Name Rejection
+        id: empty-name-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestEmptyNameRejection 2>&1 | tee empty_name_output.txt
+          echo "## Empty Name Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat empty_name_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Empty Database Rejection
+        id: empty-database-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestEmptyDatabaseRejection 2>&1 | tee empty_database_output.txt
+          echo "## Empty Database Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat empty_database_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Empty Schema Rejection
+        id: empty-schema-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestEmptySchemaRejection 2>&1 | tee empty_schema_output.txt
+          echo "## Empty Schema Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat empty_schema_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Empty Warehouse Rejection
+        id: empty-warehouse-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestEmptyWarehouseRejection 2>&1 | tee empty_warehouse_output.txt
+          echo "## Empty Warehouse Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat empty_warehouse_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Empty Query Rejection
+        id: empty-query-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestEmptyQueryRejection 2>&1 | tee empty_query_output.txt
+          echo "## Empty Query Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat empty_query_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Invalid Refresh Mode Rejection
+        id: invalid-refresh-mode-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestInvalidRefreshModeRejection 2>&1 | tee invalid_refresh_mode_output.txt
+          echo "## Invalid Refresh Mode Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat invalid_refresh_mode_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Invalid Initialize Rejection
+        id: invalid-initialize-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestInvalidInitializeRejection 2>&1 | tee invalid_initialize_output.txt
+          echo "## Invalid Initialize Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat invalid_initialize_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Invalid Target Lag Rejection
+        id: invalid-target-lag-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestInvalidTargetLagRejection 2>&1 | tee invalid_target_lag_output.txt
+          echo "## Invalid Target Lag Rejection Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat invalid_target_lag_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+      - name: Run Terratest - Default Values Applied
+        id: default-values-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestDefaultValuesApplied 2>&1 | tee default_values_output.txt
+          echo "## Default Values Applied Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat default_values_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: tests
+
+
+
+  # ============================================================================
   # Generate Change Log
   # ============================================================================
-
   generate-changelog:
     name: Generate Changelog
     runs-on: ubuntu-latest
@@ -128,7 +245,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -156,7 +273,7 @@ jobs:
   semantic-release:
     name: Semantic Release
     runs-on: ubuntu-latest
-    needs: [property-tests, examples-validate]
+    needs: [terratest, examples-validate]
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
@@ -164,17 +281,25 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          extra_plugins: |
+            @semantic-release/commit-analyzer@13.0.0
+            @semantic-release/release-notes-generator@14.0.0
+            @semantic-release/changelog@6.0.3
+            @semantic-release/git@10.0.1
+            @semantic-release/github@11.0.0
+            conventional-changelog-conventionalcommits@9.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
