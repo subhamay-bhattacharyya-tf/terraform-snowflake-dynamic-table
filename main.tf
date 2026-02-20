@@ -11,7 +11,7 @@ resource "snowflake_dynamic_table" "this" {
     maximum_duration = each.value.target_lag
   }
 
-  refresh_mode     = each.value.refresh_mode
-  initialize       = each.value.initialize
-  comment          = each.value.comment
+  refresh_mode = each.value.refresh_mode
+  initialize   = each.value.initialize
+  comment      = each.value.comment
 }
