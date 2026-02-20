@@ -13,6 +13,7 @@
 - Update CHANGELOG.md [skip ci]
 - Update CHANGELOG.md [skip ci]
 - Update module source references and target_lag validation
+- Update CHANGELOG.md [skip ci]
 
 ### 🎨 Styling
 
@@ -21,3 +22,4 @@
 ### ⚙️ Miscellaneous Tasks
 
 - Expand test coverage and add environment variable configuration
+- Update package metadata for dynamic table module
