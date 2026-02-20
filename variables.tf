@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Dynamic Table Module - Variables
+# -----------------------------------------------------------------------------
+# This file defines the input variables for the Snowflake dynamic table module.
+# It uses a map-based configuration to support creating multiple dynamic tables
+# with validation rules for all required and optional properties.
+# -----------------------------------------------------------------------------
+
 variable "dynamic_table_configs" {
   description = "Map of configuration objects for Snowflake dynamic tables"
   type = map(object({

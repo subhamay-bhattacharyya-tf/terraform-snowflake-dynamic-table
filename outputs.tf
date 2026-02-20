@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Dynamic Table Module - Outputs
+# -----------------------------------------------------------------------------
+# This file defines the output values for the Snowflake dynamic table module.
+# Outputs are keyed by the dynamic table identifier for easy reference and
+# integration with other Terraform configurations.
+# -----------------------------------------------------------------------------
+
 output "dynamic_table_names" {
   description = "The names of the created dynamic tables."
   value       = { for k, v in snowflake_dynamic_table.this : k => v.name }

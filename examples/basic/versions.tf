@@ -1,3 +1,10 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Dynamic Table Module - Basic Example Versions
+# -----------------------------------------------------------------------------
+# This file specifies the required Terraform version and provider versions
+# for the basic example.
+# -----------------------------------------------------------------------------
+
 terraform {
   required_version = ">= 1.3.0"
 

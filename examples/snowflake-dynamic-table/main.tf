@@ -1,7 +1,10 @@
-# Example: Snowflake Dynamic Table Module Usage
-#
-# This example demonstrates how to use the snowflake-dynamic-table module
-# to create multiple Snowflake dynamic tables using a map of configurations.
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Dynamic Table Module - Advanced Example
+# -----------------------------------------------------------------------------
+# This example demonstrates advanced usage of the Snowflake dynamic table
+# module to create multiple dynamic tables with various configurations
+# including different target lags, refresh modes, and data pipeline patterns.
+# -----------------------------------------------------------------------------
 
 locals {
   dynamic_tables = {

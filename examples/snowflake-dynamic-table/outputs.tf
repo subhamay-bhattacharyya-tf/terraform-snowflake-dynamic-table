@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Dynamic Table Module - Advanced Example Outputs
+# -----------------------------------------------------------------------------
+# This file defines the output values for the advanced example.
+# -----------------------------------------------------------------------------
+
 output "dynamic_table_names" {
   description = "Names of the created dynamic tables"
   value       = module.dynamic_tables.dynamic_table_names

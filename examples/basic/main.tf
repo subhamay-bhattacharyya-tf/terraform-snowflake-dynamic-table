@@ -1,7 +1,9 @@
-# Example: Basic Dynamic Table Module Usage
-#
-# This example demonstrates how to use the snowflake-dynamic-table module
-# to create a simple dynamic table.
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Dynamic Table Module - Basic Example
+# -----------------------------------------------------------------------------
+# This example demonstrates basic usage of the Snowflake dynamic table module
+# to create a simple dynamic table with default settings.
+# -----------------------------------------------------------------------------
 
 locals {
   dynamic_tables = {
