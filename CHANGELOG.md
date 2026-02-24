@@ -3,6 +3,14 @@
 ### 🚀 Features
 
 - *(grants)* Add role-based grants support for dynamic tables
+
+### 🐛 Bug Fixes
+
+- *(variables)* Improve target_lag validation regex and formatting
+
+### 📚 Documentation
+
+- Update CHANGELOG.md [skip ci]
 ## [1.0.0] - 2026-02-20
 
 ### 🚀 Features
