@@ -61,7 +61,11 @@ variable "dynamic_table_configs" {
   }
 
   validation {
-    condition     = alltrue([for k, dt in var.dynamic_table_configs : can(regex("^\\d+\\s+(downstream|second|seconds|minute|minutes|hour|hours|day|days|month|months)$", lower(dt.target_lag)))])
+    condition = alltrue([
+      for k, v in var.dynamic_table_configs :
+      can(regex("^(\\d+\\s+(second|seconds|minute|minutes|hour|hours|day|days))$", v.target_lag)) || lower(v.target_lag) == "downstream"
+    ])
     error_message = "Invalid target_lag format. Use format like '1 hour', '30 minutes', '1 day', 'downstream'."
   }
+
 }
