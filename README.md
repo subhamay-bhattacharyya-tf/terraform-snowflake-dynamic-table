@@ -35,6 +35,12 @@ locals {
       target_lag   = "30 minutes"
       refresh_mode = "INCREMENTAL"
       comment      = "Customer order metrics"
+      grants = [
+        {
+          role_name  = "ANALYST_ROLE"
+          privileges = ["SELECT"]
+        }
+      ]
     }
   }
 }
@@ -72,6 +78,14 @@ module "dynamic_tables" {
 | refresh_mode | string | "AUTO" | Refresh mode (AUTO, FULL, INCREMENTAL) |
 | initialize | string | "ON_CREATE" | When to initialize (ON_CREATE, ON_SCHEDULE) |
 | comment | string | null | Description of the dynamic table |
+| grants | list(object) | [] | List of grants to apply to the dynamic table |
+
+### grants Object Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| role_name | string | The account role to grant privileges to |
+| privileges | list(string) | List of privileges to grant (e.g., SELECT, OPERATE) |
 
 ### Valid Target Lag Formats
 
@@ -95,6 +109,7 @@ module "dynamic_tables" {
 | dynamic_table_target_lags | Map of target lag settings |
 | dynamic_table_refresh_modes | Map of refresh modes |
 | dynamic_tables | All dynamic table resources |
+| dynamic_table_grants | All dynamic table grant resources |
 
 ## Validation
 

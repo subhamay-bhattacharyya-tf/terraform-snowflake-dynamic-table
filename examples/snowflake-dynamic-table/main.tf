@@ -43,6 +43,16 @@ locals {
       target_lag   = "1 hour"
       refresh_mode = "INCREMENTAL"
       comment      = "Daily sales aggregation by region for dashboards"
+      grants = [
+        {
+          role_name  = "ANALYST_ROLE"
+          privileges = ["SELECT"]
+        },
+        {
+          role_name  = "DATA_ENGINEER_ROLE"
+          privileges = ["SELECT", "OPERATE"]
+        }
+      ]
     }
     "customer_lifetime_value" = {
       name         = "CUSTOMER_LTV_DT"

@@ -18,3 +18,8 @@ output "dynamic_table_target_lags" {
   description = "Target lag settings for each dynamic table"
   value       = module.dynamic_tables.dynamic_table_target_lags
 }
+
+output "dynamic_table_grants" {
+  description = "Grants applied to the dynamic tables"
+  value       = module.dynamic_tables.dynamic_table_grants
+}

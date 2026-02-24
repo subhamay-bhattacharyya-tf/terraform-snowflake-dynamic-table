@@ -191,3 +191,19 @@ func TestDefaultValuesApplied(t *testing.T) {
 	_, err = terraform.ValidateE(t, terraformOptions)
 	assert.NoError(t, err, "terraform validate should succeed with minimal config using defaults")
 }
+
+// TestGrantsConfigurationValidation validates that grants configuration is accepted
+func TestGrantsConfigurationValidation(t *testing.T) {
+	t.Parallel()
+
+	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		TerraformDir: "./fixtures/with_grants",
+		NoColor:      true,
+	})
+
+	_, err := terraform.InitE(t, terraformOptions)
+	assert.NoError(t, err, "terraform init should succeed")
+
+	_, err = terraform.ValidateE(t, terraformOptions)
+	assert.NoError(t, err, "terraform validate should succeed for configuration with grants")
+}

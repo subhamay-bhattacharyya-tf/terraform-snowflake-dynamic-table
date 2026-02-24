@@ -15,6 +15,12 @@ locals {
       query      = "SELECT region, SUM(amount) as total_sales FROM ANALYTICS_DB.SILVER.SALES GROUP BY region"
       target_lag = "1 hour"
       comment    = "Aggregated sales data by region"
+      grants = [
+        {
+          role_name  = "ANALYST_ROLE"
+          privileges = ["SELECT"]
+        }
+      ]
     }
   }
 }

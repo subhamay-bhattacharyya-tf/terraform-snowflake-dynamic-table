@@ -18,6 +18,10 @@ variable "dynamic_table_configs" {
     refresh_mode = optional(string, "AUTO")
     initialize   = optional(string, "ON_CREATE")
     comment      = optional(string, null)
+    grants = optional(list(object({
+      role_name  = string
+      privileges = list(string)
+    })), [])
   }))
   default = {}
 
