@@ -30,3 +30,8 @@ output "dynamic_tables" {
   description = "All dynamic table resources."
   value       = snowflake_dynamic_table.this
 }
+
+output "dynamic_table_grants" {
+  description = "All dynamic table grant resources."
+  value       = snowflake_grant_privileges_to_account_role.dynamic_table_grants
+}

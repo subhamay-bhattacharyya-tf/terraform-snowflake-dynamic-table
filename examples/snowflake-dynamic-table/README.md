@@ -16,9 +16,11 @@ This example creates multiple dynamic tables for a data pipeline:
 - Bronze to Silver transformation tables
 - Silver to Gold aggregation tables
 - Various target lag and refresh mode configurations
+- Role-based grants for access control
 
 ## Outputs
 
 - `dynamic_table_names` - Names of the created dynamic tables
 - `dynamic_table_fully_qualified_names` - Fully qualified names of the dynamic tables
 - `dynamic_table_target_lags` - Target lag settings for each table
+- `dynamic_table_grants` - Grants applied to the dynamic tables
